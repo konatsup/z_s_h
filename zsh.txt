@@ -1,0 +1,137 @@
+# ~/.zshrc
+export PATH=/Users/konatsu_p/Library/Android/sdk/tools:$PATH
+export PATH=/Users/konatsu_p/Library/Android/sdk/platform-tools:$PATH
+export PATH="$HOME/.rbenv/bin:$PATH"
+export PATH="$PATH:/opt/yarn-[version]/bin"
+if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+export PATH=$PATH:/Users/konatsu_p/.nodebrew/current/bin
+export PATH=”$HOME/.rbenv/bin:$PATH”
+export PATH="$HOME/.rbenv/shims:$PATH"
+export PATH=$PATH:/usr/local/go/bin
+export GOPATH=$HOME/go
+
+export PATH="$PATH:`pwd`/flutter/bin"
+export PATH=$PATH:$HOME/Development/flutter/bin
+
+# 参考： https://web-guided.com/post-428
+
+# --------------------------------------------------
+#  カレントディレクトリ表示（左）
+# --------------------------------------------------
+ PROMPT='
+%F{green}%(5~,%-1~/.../%2~,%~)%f
+%F{green}%B> %b%f'
+
+# --------------------------------------------------
+#  git branch状態を表示（右）
+# --------------------------------------------------
+
+autoload -Uz vcs_info
+setopt prompt_subst
+autoload -U compinit && compinit
+
+# true | false
+# trueで作業ブランチの状態に応じて表示を変える
+zstyle ':vcs_info:*' check-for-changes false
+# addしてない場合の表示
+zstyle ':vcs_info:*' unstagedstr "%F{red}%B＋%b%f"
+# commitしてない場合の表示
+zstyle ':vcs_info:*' stagedstr "%F{yellow}★ %f"
+# デフォルトの状態の表示
+zstyle ':vcs_info:*' formats "%u%c%F{green}【 %b 】%f"
+# コンフリクトが起きたり特別な状態になるとformatsの代わりに表示
+zstyle ':vcs_info:*' actionformats '【%b | %a】'
+
+precmd () { vcs_info }
+
+RPROMPT=$RPROMPT'${vcs_info_msg_0_}'
+
+# --------------------------------------------------
+#  gitコマンド補完機能セット
+# --------------------------------------------------
+
+# autoloadの文より前に記述
+fpath=(~/.zsh/completion $fpath)
+
+# --------------------------------------------------
+#  コマンド入力補完
+# --------------------------------------------------
+
+# 補完機能有効にする
+autoload -U compinit
+compinit -u
+
+# 補完候補に色つける
+autoload -U colors
+colors
+zstyle ':completion:*' list-colors "${LS_COLORS}"
+
+# 単語の入力途中でもTab補完を有効化
+setopt complete_in_word
+# 補完候補をハイライト
+zstyle ':completion:*:default' menu select=1
+# キャッシュの利用による補完の高速化
+zstyle ':completion::complete:*' use-cache true
+# 大文字、小文字を区別せず補完する
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+# 補完リストの表示間隔を狭くする
+setopt list_packed
+
+# コマンドの打ち間違いを指摘してくれる
+setopt correct
+SPROMPT="correct: $RED%R$DEFAULT -> $GREEN%r$DEFAULT ? [Yes/No/Abort/Edit] => "
+
+# --------------------------------------------------
+#  $ cd 機能拡張
+# --------------------------------------------------
+
+# cdを使わずにディレクトリを移動できる
+setopt auto_cd
+# $ cd - でTabを押すと、ディレクトリの履歴が見れる
+setopt auto_pushd
+
+# --------------------------------------------------
+#  $ tree でディレクトリ構成表示
+# --------------------------------------------------
+
+alias tree="pwd;find . | sort | sed '1d;s/^\.//;s/\/\([^/]*\)$/|--\1/;s/\/[^/|]*/| /g'"
+
+# --------------------------------------------------
+#  git エイリアス
+# --------------------------------------------------
+
+compdef g=git
+
+alias git s='git status --short --branch'
+alias git a='git add -A'
+alias git c='git commit -m'
+alias git ps='git push'
+alias git psu='git push -u origin'
+alias git p='git pull origin'
+alias git f='git fetch'
+
+# logを見やすく
+alias git l='git log --abbrev-commit --no-merges --date=short --date=iso'
+# grep
+alias git lg='git log --abbrev-commit --no-merges --date=short --date=iso --grep'
+# ローカルコミットを表示
+alias git lc='git log --abbrev-commit --no-merges --date=short --date=iso origin/html..html'
+
+alias git d='git diff'
+alias git co='git checkout'
+alias git cob='git checkout -b'
+alias git b='git branch'
+
+alias git m='git merge'
+alias git r='git reset'
+
+
+# --------------------------------------------------
+#  その他のエイリアス
+# --------------------------------------------------
+
+alias ts='tig status'
+
+export PATH="/usr/local/opt/gettext/bin:$PATH"
+export EDITOR=vim
+eval "$(direnv hook zsh)"
